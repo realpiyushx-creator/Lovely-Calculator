@@ -1,511 +1,702 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luxe Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* --- Core Setup --- */
-        :root {
-            --primary-color: #ff2e93;
-            --secondary-color: #ff88c2;
-            --accent-glow: rgba(255, 46, 147, 0.6);
-            --glass-bg: rgba(18, 18, 28, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-muted: #a0a0b0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Luxe Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            overflow: hidden;
-            background-color: #0f0c29;
-            color: var(--text-main);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <style>
+    :root {
+      --primary-color: #ff2e93;
+      --secondary-color: #ff88c2;
+      --accent-glow: rgba(255, 46, 147, 0.6);
+      --glass-bg: rgba(18, 18, 28, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #ffffff;
+      --text-muted: #a0a0b0;
+    }
 
-        /* --- Background Animation (Aurora) --- */
-        .aurora-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            z-index: -2;
-        }
-        .aurora-blob {
-            position: absolute;
-            filter: blur(80px);
-            opacity: 0.5;
-            animation: floatBlob 20s infinite alternate ease-in-out;
-            border-radius: 50%;
-        }
-        .blob-1 { background: #ff2e93; width: 500px; height: 500px; top: -10%; left: -10%; animation-delay: 0s; }
-        .blob-2 { background: #00d2ff; width: 400px; height: 400px; bottom: -10%; right: -5%; animation-delay: -5s; }
-        .blob-3 { background: #9d50bb; width: 300px; height: 300px; top: 40%; left: 40%; animation-delay: -10s; opacity: 0.3; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      background-color: #0f0c29;
+      color: var(--text-main);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        @keyframes floatBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -50px) scale(1.1); }
-        }
+    /* Background Animation */
+    .aurora-bg {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      z-index: -2;
+    }
 
-        /* --- 3D Tilt Container --- */
-        #tilt-wrapper {
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
-            perspective: 1000px;
-        }
+    .aurora-blob {
+      position: absolute;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: floatBlob 20s infinite alternate ease-in-out;
+      border-radius: 50%;
+    }
 
-        /* --- Glassmorphism Panel --- */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 
-                        inset 0 0 0 1px rgba(255,255,255,0.1);
-            border-radius: 40px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* --- Screen Display --- */
-        .display-area {
-            background: rgba(0, 0, 0, 0.2);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
-            border-right: 2px solid var(--primary-color);
-        }
-        @keyframes blink { 50% { border-color: transparent; } }
+    .blob-1 {
+      background: #ff2e93;
+      width: 500px;
+      height: 500px;
+      top: -10%;
+      left: -10%;
+      animation-delay: 0s;
+    }
 
-        /* --- Buttons --- */
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 20px;
-        }
-        
-        .calc-btn {
-            height: 65px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.03);
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 400;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .blob-2 {
+      background: #00d2ff;
+      width: 400px;
+      height: 400px;
+      bottom: -10%;
+      right: -5%;
+      animation-delay: -5s;
+    }
 
-        /* Button Visual States */
-        .calc-btn:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .calc-btn:active {
-            transform: scale(0.95);
-            background: rgba(255,255,255,0.15);
-        }
+    .blob-3 {
+      background: #9d50bb;
+      width: 300px;
+      height: 300px;
+      top: 40%;
+      left: 40%;
+      animation-delay: -10s;
+      opacity: 0.3;
+    }
 
-        /* Variant: Operators */
-        .btn-op {
-            color: var(--secondary-color);
-            font-weight: 600;
-            background: rgba(255, 46, 147, 0.05);
-        }
-        .btn-op:hover {
-            background: rgba(255, 46, 147, 0.15);
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
+    @keyframes floatBlob {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+    }
 
-        /* Variant: Equals (Call to Action) */
-        .btn-equal {
-            background: linear-gradient(135deg, #ff2e93, #ff88c2);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 20px rgba(255, 46, 147, 0.4);
-        }
-        .btn-equal:hover {
-            box-shadow: 0 0 30px rgba(255, 46, 147, 0.6);
-            transform: translateY(-2px) scale(1.02);
-        }
+    /* 3D Tilt Container */
+    #tilt-wrapper {
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      perspective: 1000px;
+    }
 
-        /* Variant: Clear/Delete */
-        .btn-danger {
-            color: #ff4757;
-            background: rgba(255, 71, 87, 0.05);
-        }
-        .btn-danger:hover { background: rgba(255, 71, 87, 0.15); }
+    /* Glass Panel */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+    }
 
-        /* --- Scientific Drawer --- */
-        .sci-drawer {
-            height: 0;
-            overflow: hidden;
-            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(0,0,0,0.1);
-        }
-        .sci-drawer.open {
-            height: 60px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .sci-btn {
-            font-size: 0.9rem;
-            height: 45px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.02);
-        }
+    /* Display */
+    .display-area {
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
 
-        /* --- History Sidebar --- */
-        .history-panel {
-            position: absolute;
-            top: 0; right: 0; bottom: 0;
-            width: 0;
-            background: rgba(15, 15, 25, 0.95);
-            backdrop-filter: blur(30px);
-            transition: width 0.3s ease;
-            z-index: 50;
-            overflow: hidden;
-            border-left: 1px solid rgba(255,255,255,0.1);
-        }
-        .history-panel.open { width: 240px; }
-        .history-item {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .history-item:hover { background: rgba(255,255,255,0.05); }
+    .cursor-blink {
+      animation: blink 1s step-end infinite;
+      border-right: 2px solid var(--primary-color);
+    }
 
-        /* --- Canvas Overlay --- */
-        #fx-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            pointer-events: none;
-            z-index: 100;
-        }
+    @keyframes blink {
+      50% {
+        border-color: transparent;
+      }
+    }
 
-        /* Utility */
-        .icon-shadow { filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
-    </style>
+    /* Buttons grid */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .calc-btn {
+      height: 65px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 400;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calc-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .calc-btn:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-op {
+      color: var(--secondary-color);
+      font-weight: 600;
+      background: rgba(255, 46, 147, 0.05);
+    }
+
+    .btn-op:hover {
+      background: rgba(255, 46, 147, 0.15);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .btn-equal {
+      background: linear-gradient(135deg, #ff2e93, #ff88c2);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(255, 46, 147, 0.4);
+    }
+
+    .btn-equal:hover {
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.6);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-danger {
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.05);
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 71, 87, 0.15);
+    }
+
+    /* Scientific drawer */
+    .sci-drawer {
+      height: 0;
+      overflow: hidden;
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .sci-drawer.open {
+      height: 60px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sci-btn {
+      font-size: 0.9rem;
+      height: 45px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* History panel */
+    .history-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 0;
+      background: rgba(15, 15, 25, 0.95);
+      backdrop-filter: blur(30px);
+      transition: width 0.3s ease;
+      z-index: 50;
+      overflow: hidden;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .history-panel.open {
+      width: 240px;
+    }
+
+    .history-item {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .icon-shadow {
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
 </head>
 <body class="flex items-center justify-center h-screen">
 
-    <!-- Background Elements -->
-    <div class="aurora-bg">
-        <div class="aurora-blob blob-1"></div>
-        <div class="aurora-blob blob-2"></div>
-        <div class="aurora-blob blob-3"></div>
-    </div>
-    <canvas id="fx-canvas"></canvas>
+<!-- Background -->
+<div class="aurora-bg">
+  <div class="aurora-blob blob-1"></div>
+  <div class="aurora-blob blob-2"></div>
+  <div class="aurora-blob blob-3"></div>
+</div>
+<canvas id="fx-canvas"></canvas>
 
-    <!-- 3D Tilt Wrapper -->
-    <div id="tilt-wrapper" class="relative z-10 w-full max-w-[380px] px-4">
-        
-        <!-- Main Calculator Card -->
-        <div class="glass-panel flex flex-col min-h-[600px]">
-            
-            <!-- Top Bar -->
-            <div class="flex justify-between items-center p-5 pb-2 opacity-80">
-                <button onclick="toggleHistory()" class="p-2 hover:text-pink-400 transition-colors"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                <span class="text-xs font-bold tracking-[0.2em] text-pink-300 uppercase glow-text">Luxe Math</span>
-                <button onclick="toggleScientific()" class="p-2 hover:text-cyan-400 transition-colors"><i class="fa-solid fa-flask"></i></button>
-            </div>
+<!-- Tilt wrapper -->
+<div id="tilt-wrapper" class="relative z-10 w-full max-w-[380px] px-4">
+  <div class="glass-panel flex flex-col min-h-[600px]">
 
-            <!-- Display -->
-            <div class="display-area flex flex-col justify-end items-end p-6 mb-2 h-[140px]">
-                <div id="prev-calc" class="text-gray-400 text-sm font-light h-6 mb-1 tracking-wide"></div>
-                <div id="display-wrapper" class="w-full overflow-hidden text-right">
-                    <span id="display" class="text-5xl font-light text-white cursor-blink whitespace-nowrap">0</span>
-                </div>
-            </div>
-
-            <!-- Scientific Drawer -->
-            <div id="sci-drawer" class="sci-drawer px-4 flex items-center justify-between gap-2">
-                <button onclick="func('sin')" class="sci-btn flex-1 text-cyan-300">sin</button>
-                <button onclick="func('cos')" class="sci-btn flex-1 text-cyan-300">cos</button>
-                <button onclick="func('sqrt')" class="sci-btn flex-1 text-cyan-300">√</button>
-                <button onclick="func('pow')" class="sci-btn flex-1 text-cyan-300">x²</button>
-                <button onclick="input('3.14159')" class="sci-btn flex-1 text-cyan-300">π</button>
-            </div>
-
-            <!-- Main Keypad -->
-            <div class="btn-grid flex-1">
-                <button onclick="clearAll()" class="calc-btn btn-danger text-lg font-bold">AC</button>
-                <button onclick="deleteChar()" class="calc-btn btn-danger"><i class="fa-solid fa-delete-left"></i></button>
-                <button onclick="op('%')" class="calc-btn btn-op"><i class="fa-solid fa-percent text-sm"></i></button>
-                <button onclick="op('/')" class="calc-btn btn-op"><i class="fa-solid fa-divide"></i></button>
-
-                <button onclick="input('7')" class="calc-btn">7</button>
-                <button onclick="input('8')" class="calc-btn">8</button>
-                <button onclick="input('9')" class="calc-btn">9</button>
-                <button onclick="op('*')" class="calc-btn btn-op"><i class="fa-solid fa-xmark"></i></button>
-
-                <button onclick="input('4')" class="calc-btn">4</button>
-                <button onclick="input('5')" class="calc-btn">5</button>
-                <button onclick="input('6')" class="calc-btn">6</button>
-                <button onclick="op('-')" class="calc-btn btn-op"><i class="fa-solid fa-minus"></i></button>
-
-                <button onclick="input('1')" class="calc-btn">1</button>
-                <button onclick="input('2')" class="calc-btn">2</button>
-                <button onclick="input('3')" class="calc-btn">3</button>
-                <button onclick="op('+')" class="calc-btn btn-op"><i class="fa-solid fa-plus"></i></button>
-
-                <button onclick="input('0')" class="calc-btn col-span-2" style="justify-content: flex-start; padding-left: 2rem;">0</button>
-                <button onclick="input('.')" class="calc-btn">.</button>
-                <button id="btn-equal" onclick="calculate()" class="calc-btn btn-equal"><i class="fa-solid fa-equals"></i></button>
-            </div>
-
-            <!-- History Panel -->
-            <div id="history-panel" class="history-panel flex flex-col">
-                <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                    <span class="font-bold text-pink-400">History</span>
-                    <button onclick="toggleHistory()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
-                </div>
-                <div id="history-list" class="flex-1 overflow-y-auto p-2 scrollbar-hide">
-                    <!-- Items injected here -->
-                    <div class="text-center text-gray-600 mt-10 text-sm">No calculations yet</div>
-                </div>
-                <button onclick="clearHistory()" class="m-4 p-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30">Clear All</button>
-            </div>
-
-        </div>
+    <!-- Top bar -->
+    <div class="flex justify-between items-center p-5 pb-2 opacity-80">
+      <button onclick="toggleHistory()" class="p-2 hover:text-pink-400 transition-colors">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </button>
+      <span class="text-xs font-bold tracking-[0.2em] text-pink-300 uppercase">Luxe Math</span>
+      <button onclick="toggleScientific()" class="p-2 hover:text-cyan-400 transition-colors">
+        <i class="fa-solid fa-flask"></i>
+      </button>
     </div>
 
-    <script>
-        /* --- Engine & State --- */
-        let currentExp = '0';
-        let lastResult = null;
-        let history = [];
-        
-        const displayEl = document.getElementById('display');
-        const prevEl = document.getElementById('prev-calc');
-        const historyListEl = document.getElementById('history-list');
-        
-        // Init Audio
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    <!-- Display -->
+    <div class="display-area flex flex-col justify-end items-end p-6 mb-2 h-[140px]">
+      <div id="prev-calc" class="text-gray-400 text-sm font-light h-6 mb-1 tracking-wide"></div>
+      <div id="display-wrapper" class="w-full overflow-hidden text-right">
+        <span id="display" class="text-5xl font-light text-white cursor-blink whitespace-nowrap">0</span>
+      </div>
+    </div>
 
-        function playTone(freq, type = 'sine', dur = 0.1) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + dur);
+    <!-- Scientific drawer -->
+    <div id="sci-drawer" class="sci-drawer px-4 flex items-center justify-between gap-2">
+      <button onclick="func('sin', event)" class="sci-btn flex-1 text-cyan-300">sin</button>
+      <button onclick="func('cos', event)" class="sci-btn flex-1 text-cyan-300">cos</button>
+      <button onclick="func('sqrt', event)" class="sci-btn flex-1 text-cyan-300">√</button>
+      <button onclick="func('pow', event)" class="sci-btn flex-1 text-cyan-300">x²</button>
+      <button onclick="input('3.14159', event)" class="sci-btn flex-1 text-cyan-300">π</button>
+    </div>
+
+    <!-- Keypad -->
+    <div class="btn-grid flex-1">
+      <button onclick="clearAll(event)" class="calc-btn btn-danger text-lg font-bold">AC</button>
+      <button onclick="deleteChar(event)" class="calc-btn btn-danger">
+        <i class="fa-solid fa-delete-left"></i>
+      </button>
+      <button onclick="op('%', event)" class="calc-btn btn-op">
+        <i class="fa-solid fa-percent text-sm"></i>
+      </button>
+      <button onclick="op('/', event)" class="calc-btn btn-op">
+        <i class="fa-solid fa-divide"></i>
+      </button>
+
+      <button onclick="input('7', event)" class="calc-btn">7</button>
+      <button onclick="input('8', event)" class="calc-btn">8</button>
+      <button onclick="input('9', event)" class="calc-btn">9</button>
+      <button onclick="op('*', event)" class="calc-btn btn-op">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <button onclick="input('4', event)" class="calc-btn">4</button>
+      <button onclick="input('5', event)" class="calc-btn">5</button>
+      <button onclick="input('6', event)" class="calc-btn">6</button>
+      <button onclick="op('-', event)" class="calc-btn btn-op">
+        <i class="fa-solid fa-minus"></i>
+      </button>
+
+      <button onclick="input('1', event)" class="calc-btn">1</button>
+      <button onclick="input('2', event)" class="calc-btn">2</button>
+      <button onclick="input('3', event)" class="calc-btn">3</button>
+      <button onclick="op('+', event)" class="calc-btn btn-op">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+
+      <button onclick="input('0', event)" class="calc-btn col-span-2"
+              style="justify-content: flex-start; padding-left: 2rem;">0</button>
+      <button onclick="input('.', event)" class="calc-btn">.</button>
+      <button id="btn-equal" onclick="calculate(event)" class="calc-btn btn-equal">
+        <i class="fa-solid fa-equals"></i>
+      </button>
+    </div>
+
+    <!-- History panel -->
+    <div id="history-panel" class="history-panel flex flex-col">
+      <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+        <span class="font-bold text-pink-400">History</span>
+        <button onclick="toggleHistory()" class="text-gray-400 hover:text-white">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div id="history-list" class="flex-1 overflow-y-auto p-2 scrollbar-hide">
+        <div class="text-center text-gray-600 mt-10 text-sm">No calculations yet</div>
+      </div>
+      <button onclick="clearHistory()"
+              class="m-4 p-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30">
+        Clear All
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* --- Engine & State --- */
+  let currentExp = '0';
+  let history = [];
+
+  const displayEl = document.getElementById('display');
+  const prevEl = document.getElementById('prev-calc');
+  const historyListEl = document.getElementById('history-list');
+
+  // Audio
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTone(freq, type = 'sine', dur = 0.1) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  }
+
+  function playClick() {
+    playTone(800, 'sine', 0.08);
+  }
+
+  function playSuccess() {
+    playTone(400, 'triangle', 0.1);
+    setTimeout(() => playTone(600, 'triangle', 0.1), 100);
+    setTimeout(() => playTone(1000, 'triangle', 0.18), 200);
+  }
+
+  function playError() {
+    playTone(150, 'sawtooth', 0.3);
+  }
+
+  /* --- Core Logic --- */
+
+  function render() {
+    let view = currentExp;
+    view = view.replace(/\*/g, '×').replace(/\//g, '÷');
+    if (view === '') view = '0';
+    displayEl.innerText = view;
+
+    const len = view.length;
+    if (len > 14) displayEl.style.fontSize = '1.5rem';
+    else if (len > 9) displayEl.style.fontSize = '2.5rem';
+    else displayEl.style.fontSize = '3.5rem';
+  }
+
+  function safeSpawnParticles(evtOrElement, type = 'confetti') {
+    try {
+      spawnParticles(evtOrElement, type);
+    } catch (_) {
+      // fail silently
+    }
+  }
+
+  function input(val, evt) {
+    playClick();
+    safeSpawnParticles(evt, 'white');
+
+    if (currentExp === '0' && val !== '.') currentExp = val;
+    else currentExp += val;
+    render();
+  }
+
+  function op(val, evt) {
+    playClick();
+    safeSpawnParticles(evt, 'confetti');
+
+    const lastChar = currentExp.slice(-1);
+    if (['+', '-', '*', '/', '%'].includes(lastChar)) {
+      currentExp = currentExp.slice(0, -1) + val;
+    } else {
+      currentExp += val;
+    }
+    render();
+  }
+
+  function func(type, evt) {
+    playClick();
+    safeSpawnParticles(evt, 'confetti');
+
+    if (currentExp === '0') currentExp = '';
+
+    if (type === 'sqrt') currentExp += 'Math.sqrt(';
+    else if (type === 'sin') currentExp += 'Math.sin(';
+    else if (type === 'cos') currentExp += 'Math.cos(';
+    else if (type === 'pow') currentExp += '**2';
+
+    render();
+  }
+
+  function deleteChar(evt) {
+    playClick();
+    safeSpawnParticles(evt, 'white');
+
+    if (currentExp.length === 1) currentExp = '0';
+    else currentExp = currentExp.slice(0, -1);
+    render();
+  }
+
+  function clearAll(evt) {
+    playClick();
+    safeSpawnParticles(evt, 'white');
+    currentExp = '0';
+    prevEl.innerText = '';
+    render();
+  }
+
+  function calculate(evt) {
+    try {
+      // Easter eggs
+      if (currentExp === '520' || currentExp === '1314') {
+        createExplosion(window.innerWidth / 2, window.innerHeight / 2, 'love');
+        playSuccess();
+        prevEl.innerText = "Secret Code Found ❤️";
+        return;
+      }
+
+      let evalStr = currentExp.replace(/×/g, '*').replace(/÷/g, '/');
+
+      // auto-close single extra '('
+      try {
+        // test eval; if invalid due to bracket, patch
+        // this outer eval is only for syntax check
+        // eslint-disable-next-line no-eval
+        eval(evalStr);
+      } catch (e) {
+        const open = (evalStr.match(/\(/g) || []).length;
+        const close = (evalStr.match(/\)/g) || []).length;
+        if (open > close) {
+          evalStr += ')'.repeat(open - close);
         }
+      }
 
-        function playClick() { playTone(800, 'sine', 0.1); }
-        function playSuccess() { 
-            playTone(400, 'triangle', 0.1);
-            setTimeout(() => playTone(600, 'triangle', 0.1), 100);
-            setTimeout(() => playTone(1000, 'triangle', 0.2), 200);
-        }
-        function playError() { playTone(150, 'sawtooth', 0.3); }
+      // final eval
+      // eslint-disable-next-line no-eval
+      const result = eval(evalStr);
 
-        /* --- Core Logic --- */
+      if (!isFinite(result) || isNaN(result)) throw new Error("Invalid");
 
-        function render() {
-            // Formatting: Add commas
-            let view = currentExp;
-            // Basic replacement for operators to look nice
-            view = view.replace(/\*/g, '×').replace(/\//g, '÷');
-            displayEl.innerText = view;
-            
-            // Dynamic Font Size
-            const len = currentExp.length;
-            if(len > 14) displayEl.style.fontSize = '1.5rem';
-            else if(len > 9) displayEl.style.fontSize = '2.5rem';
-            else displayEl.style.fontSize = '3.5rem';
-        }
+      const btnRect = document.getElementById('btn-equal').getBoundingClientRect();
+      createExplosion(btnRect.left + btnRect.width / 2, btnRect.top + btnRect.height / 2, 'confetti');
+      playSuccess();
 
-        function input(val) {
-            playClick();
-            spawnParticles(event.target, 'white');
-            
-            if (currentExp === '0' && val !== '.') currentExp = val;
-            else currentExp += val;
-            render();
-        }
+      addToHistory(currentExp, result);
 
-        function op(val) {
-            playClick();
-            const lastChar = currentExp.slice(-1);
-            if (['+','-','*','/','%'].includes(lastChar)) {
-                currentExp = currentExp.slice(0, -1) + val;
-            } else {
-                currentExp += val;
-            }
-            render();
-        }
+      prevEl.innerText = currentExp + ' =';
+      currentExp = String(parseFloat(result.toFixed(8)));
+      render();
+    } catch (e) {
+      playError();
+      prevEl.innerText = "Error";
+      shakeScreen();
+    }
+  }
 
-        function func(type) {
-            playClick();
-            if(currentExp === '0') currentExp = '';
-            
-            if(type === 'sqrt') currentExp += 'Math.sqrt(';
-            else if(type === 'sin') currentExp += 'Math.sin(';
-            else if(type === 'cos') currentExp += 'Math.cos(';
-            else if(type === 'pow') currentExp += '**2';
-            render();
-        }
+  /* --- History System --- */
+  function addToHistory(expr, res) {
+    const item = { expr, res, time: new Date().toLocaleTimeString() };
+    history.unshift(item);
+    updateHistoryUI();
+  }
 
-        function deleteChar() {
-            playClick();
-            if (currentExp.length === 1) currentExp = '0';
-            else currentExp = currentExp.slice(0, -1);
-            render();
-        }
+  function updateHistoryUI() {
+    if (history.length === 0) {
+      historyListEl.innerHTML =
+        '<div class="text-center text-gray-600 mt-10 text-sm">No calculations yet</div>';
+      return;
+    }
+    historyListEl.innerHTML = history.map(h => `
+      <div class="history-item flex flex-col" onclick="loadHistory('${h.res}')">
+        <span class="text-xs text-gray-500 text-right">${h.expr}</span>
+        <span class="text-xl text-pink-300 font-mono text-right">= ${h.res}</span>
+      </div>
+    `).join('');
+  }
 
-        function clearAll() {
-            playClick();
-            currentExp = '0';
-            prevEl.innerText = '';
-            render();
-        }
+  function loadHistory(val) {
+    currentExp = String(val);
+    render();
+    toggleHistory();
+  }
 
-        function calculate() {
-            try {
-                // Easter eggs
-                if(currentExp === '520' || currentExp === '1314') {
-                    createExplosion(window.innerWidth/2, window.innerHeight/2, 'love');
-                    playSuccess();
-                    prevEl.innerText = "Secret Code Found ❤️";
-                    return;
-                }
+  function clearHistory() {
+    history = [];
+    updateHistoryUI();
+  }
 
-                // Evaluate
-                let evalStr = currentExp
-                    .replace(/×/g, '*')
-                    .replace(/÷/g, '/');
-                
-                // Catch unclosed parenthesis
-                try {
-                    eval(evalStr);
-                } catch (e) {
-                    if(evalStr.includes('(') && !evalStr.includes(')')) evalStr += ')';
-                }
+  function toggleHistory() {
+    document.getElementById('history-panel').classList.toggle('open');
+  }
 
-                const result = eval(evalStr);
-                
-                if (!isFinite(result) || isNaN(result)) throw new Error("Invalid");
+  function toggleScientific() {
+    document.getElementById('sci-drawer').classList.toggle('open');
+  }
 
-                // Success Animation
-                const btnRect = document.getElementById('btn-equal').getBoundingClientRect();
-                createExplosion(btnRect.left + btnRect.width/2, btnRect.top + btnRect.height/2, 'confetti');
-                playSuccess();
+  function shakeScreen() {
+    const el = document.querySelector('.glass-panel');
+    el.style.transform = 'translateX(5px)';
+    setTimeout(() => el.style.transform = 'translateX(-5px)', 50);
+    setTimeout(() => el.style.transform = 'translateX(5px)', 100);
+    setTimeout(() => el.style.transform = 'translateX(0)', 150);
+  }
 
-                // Update History
-                addToHistory(currentExp, result);
+  /* --- Visual FX Engine --- */
+  const canvas = document.getElementById('fx-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
 
-                // Update Display
-                prevEl.innerText = currentExp + ' =';
-                currentExp = String(parseFloat(result.toFixed(8))); // remove trailing zeros
-                render();
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 
-            } catch (e) {
-                playError();
-                prevEl.innerText = "Error";
-                shakeScreen();
-            }
-        }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-        /* --- History System --- */
-        function addToHistory(expr, res) {
-            const item = { expr, res, time: new Date().toLocaleTimeString() };
-            history.unshift(item);
-            updateHistoryUI();
-        }
+  class Particle {
+    constructor(x, y, type) {
+      this.x = x;
+      this.y = y;
+      this.type = type;
+      this.size = Math.random() * 5 + 2;
+      this.speedX = Math.random() * 6 - 3;
+      this.speedY = Math.random() * 6 - 3;
+      this.life = 1;
+      this.decay = Math.random() * 0.02 + 0.01;
+      this.color = `hsl(${Math.random() * 60 + 300}, 100%, 70%)`; // pink/purple
+      if (type === 'white') {
+        this.color = `rgba(255,255,255,${Math.random()})`;
+      }
+    }
 
-        function updateHistoryUI() {
-            if(history.length === 0) {
-                historyListEl.innerHTML = '<div class="text-center text-gray-600 mt-10 text-sm">No calculations yet</div>';
-                return;
-            }
-            historyListEl.innerHTML = history.map(h => `
-                <div class="history-item flex flex-col" onclick="loadHistory('${h.res}')">
-                    <span class="text-xs text-gray-500 text-right">${h.expr}</span>
-                    <span class="text-xl text-pink-300 font-mono text-right">= ${h.res}</span>
-                </div>
-            `).join('');
-        }
-        
-        function loadHistory(val) {
-            currentExp = String(val);
-            render();
-            toggleHistory();
-        }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= this.decay;
+      this.size *= 0.96;
+    }
 
-        function clearHistory() {
-            history = [];
-            updateHistoryUI();
-        }
+    draw() {
+      ctx.globalAlpha = Math.max(this.life, 0);
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      if (this.type === 'love') {
+        // heart
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        const s = this.size / 3;
+        ctx.scale(s, s);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-2, -2, -4, 1, 0, 4);
+        ctx.bezierCurveTo(4, 1, 2, -2, 0, 0);
+        ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
 
-        function toggleHistory() {
-            document.getElementById('history-panel').classList.toggle('open');
-        }
-        function toggleScientific() {
-            document.getElementById('sci-drawer').classList.toggle('open');
-        }
+  function createExplosion(x, y, mode = 'confetti') {
+    const count = mode === 'love' ? 40 : 30;
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle(x, y, mode === 'love' ? 'love' : 'confetti'));
+    }
+  }
 
-        function shakeScreen() {
-            const el = document.querySelector('.glass-panel');
-            el.style.transform = 'translateX(5px)';
-            setTimeout(() => el.style.transform = 'translateX(-5px)', 50);
-            setTimeout(() => el.style.transform = 'translateX(5px)', 100);
-            setTimeout(() => el.style.transform = 'translateX(0)', 150);
-        }
+  function spawnParticles(source, type = 'confetti') {
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
 
-        /* --- Visual FX Engine (Canvas) --- */
-        const canvas = document.getElementById('fx-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+    if (source) {
+      let rect = null;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+      if (source instanceof Element) {
+        rect = source.getBoundingClientRect();
+      } else if (source.target && source.target.getBoundingClientRect) {
+        rect = source.target.getBoundingClientRect();
+      }
 
-        class Particle {
-            constructor(x, y, type) {
-                this.x = x;
-                this.y = y;
-                this.type = type;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 6 - 3;
-                this.speedY = Math.random() * 6 - 3;
-                this.life = 1;
-                this.decay = Math.random() * 0.02 + 0.01;
-                this.color = `hsl(${Math.random() * 60 + 300}, 100%, 70%)`; // Pinks/Purples
-                if(type === 'white') this.color = `rgba(255,255,255,${Math.random()})`;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.life -= this.decay;
-                this.size *= 0.95;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                if (this.type === 'love') {
-                    // Draw Heart
-                    // simplified drawing for performance
-                    ctx.font = `${this.size * 4
+      if (rect) {
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      } else if (source.clientX != null && source.clientY != null) {
+        x = source.clientX;
+        y = source.clientY;
+      }
+    }
+
+    const count = 12;
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle(x, y, type));
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.life > 0 && p.size > 0.4);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+
+  animateParticles();
+
+  /* --- Tilt Effect --- */
+  const tiltWrapper = document.getElementById('tilt-wrapper');
+
+  function handleTilt(clientX, clientY) {
+    const rect = tiltWrapper.getBoundingClientRect();
+    const x = (clientX - rect.left - rect.width / 2) / rect.width;
+    const y = (clientY - rect.top - rect.height / 2) / rect.height;
+
+    const rotateX = y * 10;
+    const rotateY = -x * 10;
+    tiltWrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  }
+
+  tiltWrapper.addEventListener('mousemove', (e) => {
+    handleTilt(e.clientX, e.clientY);
+  });
+
+  tiltWrapper.addEventListener('mouseleave', () => {
+    tiltWrapper.style.transform = 'rotateX(0deg) rotateY(0d
