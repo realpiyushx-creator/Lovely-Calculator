@@ -6,7 +6,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Luxe Math</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fonts & Icons -->
@@ -25,9 +25,7 @@
       --text-muted: #9ca3af;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -42,7 +40,7 @@
       overflow: hidden;
     }
 
-    /* Soft floating blur orbs */
+    /* Background orbs */
     .orb {
       position: fixed;
       border-radius: 999px;
@@ -53,35 +51,12 @@
       mix-blend-mode: screen;
       animation: float 18s ease-in-out infinite alternate;
     }
-
-    .orb-1 {
-      width: 420px;
-      height: 420px;
-      background: #ff2e93;
-      top: -80px;
-      left: -140px;
-    }
-
-    .orb-2 {
-      width: 360px;
-      height: 360px;
-      background: #4f46e5;
-      bottom: -120px;
-      right: -140px;
-      animation-delay: -6s;
-    }
-
-    .orb-3 {
-      width: 260px;
-      height: 260px;
-      background: #06b6d4;
-      top: 40%;
-      right: 15%;
-      animation-delay: -12s;
-    }
+    .orb-1 { width: 420px; height: 420px; background: #ff2e93; top: -80px; left: -140px; }
+    .orb-2 { width: 360px; height: 360px; background: #4f46e5; bottom: -120px; right: -140px; animation-delay: -6s; }
+    .orb-3 { width: 260px; height: 260px; background: #06b6d4; top: 40%; right: 15%; animation-delay: -12s; }
 
     @keyframes float {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
       100% { transform: translate3d(40px, -40px, 0) scale(1.05); }
     }
 
@@ -123,11 +98,7 @@
     }
 
     /* Display */
-    .display-shell {
-      padding: 1.1rem 1.35rem 0.75rem;
-      position: relative;
-    }
-
+    .display-shell { padding: 1.1rem 1.35rem 0.75rem; position: relative; }
     .display-shell::before {
       content: "";
       position: absolute;
@@ -176,10 +147,7 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
-    .display-main-wrap::-webkit-scrollbar {
-      display: none;
-    }
+    .display-main-wrap::-webkit-scrollbar { display: none; }
 
     .display-main {
       display: inline-block;
@@ -191,9 +159,7 @@
       animation: caret 1.1s steps(2, start) infinite;
     }
 
-    @keyframes caret {
-      50% { border-color: transparent; }
-    }
+    @keyframes caret { 50% { border-color: transparent; } }
 
     /* Top bar pills */
     .chip {
@@ -208,10 +174,8 @@
       align-items: center;
       gap: 0.35rem;
     }
-
     .chip-dot {
-      width: 6px;
-      height: 6px;
+      width: 6px; height: 6px;
       border-radius: 999px;
       background: #22c55e;
       box-shadow: 0 0 6px rgba(34, 197, 94, 0.9);
@@ -259,14 +223,7 @@
         0 0 0 1px rgba(148, 163, 184, 0.12);
     }
 
-    .btn-op:active {
-      background: radial-gradient(circle at bottom, rgba(136, 19, 55, 0.65), rgba(15, 23, 42, 0.95));
-    }
-
-    .btn-ac,
-    .btn-del {
-      color: #fb7185;
-    }
+    .btn-ac, .btn-del { color: #fb7185; }
 
     .btn-eq {
       background: linear-gradient(135deg, #ff2e93, #ff88c2);
@@ -278,7 +235,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .btn-eq::before {
       content: "";
       position: absolute;
@@ -287,10 +243,7 @@
       opacity: 0;
       transition: opacity 0.12s ease-out;
     }
-
-    .btn-eq:active::before {
-      opacity: 1;
-    }
+    .btn-eq:active::before { opacity: 1; }
 
     .btn-zero {
       justify-content: flex-start;
@@ -298,35 +251,30 @@
       grid-column: span 2 / span 2;
     }
 
-    .btn-small {
-      font-size: 1.05rem;
-    }
+    .btn-small { font-size: 1.05rem; }
 
-    /* Sci drawer */
+    /* Scientific drawer */
     .sci-drawer {
-      height: 0;
+      max-height: 0;
       overflow: hidden;
-      transition: height 0.3s ease;
+      transition: max-height 0.3s ease;
       padding: 0 1.35rem;
     }
+    .sci-open { max-height: 230px; }
 
     .sci-drawer-inner {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 0.5rem;
-      padding-bottom: 0.6rem;
-    }
-
-    .sci-open {
-      height: 58px;
+      gap: 0.4rem;
+      padding: 0.4rem 0 0.6rem;
     }
 
     .sci-btn {
-      height: 40px;
+      height: 38px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       color: #a5b4fc;
       display: flex;
       align-items: center;
@@ -334,8 +282,9 @@
       cursor: pointer;
       transition: background 0.12s ease, transform 0.08s ease;
       user-select: none;
+      padding: 0 0.4rem;
+      text-align: center;
     }
-
     .sci-btn:active {
       transform: translateY(1px) scale(0.97);
       background: rgba(30, 64, 175, 0.85);
@@ -358,10 +307,7 @@
       transition: width 0.25s ease;
       z-index: 10;
     }
-
-    .history-panel.open {
-      width: 230px;
-    }
+    .history-panel.open { width: 230px; }
 
     .history-item {
       padding: 0.65rem 0.75rem;
@@ -369,10 +315,7 @@
       cursor: pointer;
       transition: background 0.12s ease;
     }
-
-    .history-item:hover {
-      background: rgba(31, 41, 55, 0.9);
-    }
+    .history-item:hover { background: rgba(31, 41, 55, 0.9); }
 
     .history-expr {
       font-size: 0.7rem;
@@ -382,7 +325,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
     .history-res {
       font-size: 1.05rem;
       color: #f9a8d4;
@@ -390,18 +332,11 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
-    .scroll-hide::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
+    .scroll-hide::-webkit-scrollbar { width: 0; height: 0; }
 
     @media (max-width: 400px) {
-      .calc-card {
-        min-height: 540px;
-      }
-      .btn {
-        height: 60px;
-      }
+      .calc-card { min-height: 540px; }
+      .btn { height: 60px; }
     }
   </style>
 </head>
@@ -418,7 +353,7 @@
       <!-- Top bar -->
       <div class="flex items-center justify-between px-5 pt-4 pb-2 relative z-10">
         <button id="btn-history-open"
-                class="rounded-full px-2 py-1 text-xs text-slate-300 bg-slate-900/70 border border-slate-600/60 flex items-center gap-1">
+          class="rounded-full px-2 py-1 text-xs text-slate-300 bg-slate-900/70 border border-slate-600/60 flex items-center gap-1">
           <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
           <span>History</span>
         </button>
@@ -429,7 +364,7 @@
         </div>
 
         <button id="btn-sci-toggle"
-                class="rounded-full w-8 h-8 flex items-center justify-center bg-slate-900/80 border border-slate-600/60 text-slate-200">
+          class="rounded-full w-8 h-8 flex items-center justify-center bg-slate-900/80 border border-slate-600/60 text-slate-200">
           <i class="fa-solid fa-flask text-[13px]"></i>
         </button>
       </div>
@@ -445,14 +380,68 @@
         </div>
       </div>
 
-      <!-- Scientific drawer -->
+      <!-- Scientific drawer with 50 math symbols -->
       <div id="sci-drawer" class="sci-drawer">
         <div class="sci-drawer-inner">
-          <button class="sci-btn" data-func="sin">sin</button>
-          <button class="sci-btn" data-func="cos">cos</button>
-          <button class="sci-btn" data-func="sqrt">√</button>
-          <button class="sci-btn" data-func="pow">x²</button>
-          <button class="sci-btn" data-input="3.14159">π</button>
+          <!-- 1–10 -->
+          <button class="sci-btn" data-insert="(">(</button>
+          <button class="sci-btn" data-insert=")">)</button>
+          <button class="sci-btn" data-insert="Math.PI">π</button>
+          <button class="sci-btn" data-insert="Math.E">e</button>
+          <button class="sci-btn" data-insert="Math.sin(">sin</button>
+          <button class="sci-btn" data-insert="Math.cos(">cos</button>
+          <button class="sci-btn" data-insert="Math.tan(">tan</button>
+          <button class="sci-btn" data-insert="Math.asin(">sin⁻¹</button>
+          <button class="sci-btn" data-insert="Math.acos(">cos⁻¹</button>
+          <button class="sci-btn" data-insert="Math.atan(">tan⁻¹</button>
+
+          <!-- 11–20 -->
+          <button class="sci-btn" data-insert="Math.sinh(">sinh</button>
+          <button class="sci-btn" data-insert="Math.cosh(">cosh</button>
+          <button class="sci-btn" data-insert="Math.tanh(">tanh</button>
+          <button class="sci-btn" data-insert="Math.log10(">log₁₀</button>
+          <button class="sci-btn" data-insert="Math.log(">ln</button>
+          <button class="sci-btn" data-insert="Math.log2(">log₂</button>
+          <button class="sci-btn" data-insert="Math.exp(">eˣ</button>
+          <button class="sci-btn" data-insert="10**">10ˣ</button>
+          <button class="sci-btn" data-insert="2**">2ˣ</button>
+          <button class="sci-btn" data-insert="Math.sqrt(">√x</button>
+
+          <!-- 21–30 -->
+          <button class="sci-btn" data-insert="Math.cbrt(">∛x</button>
+          <button class="sci-btn" data-insert="1/">1/x</button>
+          <button class="sci-btn" data-insert="Math.abs(">abs</button>
+          <button class="sci-btn" data-insert="Math.floor(">floor</button>
+          <button class="sci-btn" data-insert="Math.ceil(">ceil</button>
+          <button class="sci-btn" data-insert="Math.round(">round</button>
+          <button class="sci-btn" data-insert="Math.trunc(">trunc</button>
+          <button class="sci-btn" data-insert="Math.sign(">sign</button>
+          <button class="sci-btn" data-insert="Math.max(">max(,)</button>
+          <button class="sci-btn" data-insert="Math.min(">min(,)</button>
+
+          <!-- 31–40 -->
+          <button class="sci-btn" data-insert="Math.pow(">pow(,)</button>
+          <button class="sci-btn" data-insert="Math.hypot(">hypot(,)</button>
+          <button class="sci-btn" data-insert="Math.random()">rand</button>
+          <button class="sci-btn" data-insert="+">+</button>
+          <button class="sci-btn" data-insert="-">−</button>
+          <button class="sci-btn" data-insert="*">×</button>
+          <button class="sci-btn" data-insert="/">÷</button>
+          <button class="sci-btn" data-insert="%">mod</button>
+          <button class="sci-btn" data-insert="Math.imul(">imul</button>
+          <button class="sci-btn" data-insert="Math.fround(">fround</button>
+
+          <!-- 41–50 -->
+          <button class="sci-btn" data-insert="Math.clz32(">clz32</button>
+          <button class="sci-btn" data-insert="Math.atan2(">atan2(,)</button>
+          <button class="sci-btn" data-insert="Math.E**">e^</button>
+          <button class="sci-btn" data-insert="Math.PI**">π^</button>
+          <button class="sci-btn" data-insert="0b">bin</button>
+          <button class="sci-btn" data-insert="0x">hex</button>
+          <button class="sci-btn" data-insert="0o">oct</button>
+          <button class="sci-btn" data-insert="Math.LN2">ln2</button>
+          <button class="sci-btn" data-insert="Math.LN10">ln10</button>
+          <button class="sci-btn" data-insert="Math.SQRT2">√2</button>
         </div>
       </div>
 
@@ -495,7 +484,7 @@
             <span class="text-[11px] text-slate-400">Tap a result to reuse</span>
           </div>
           <button id="btn-history-close"
-                  class="w-7 h-7 rounded-full border border-slate-600 flex items-center justify-center text-slate-300">
+            class="w-7 h-7 rounded-full border border-slate-600 flex items-center justify-center text-slate-300">
             <i class="fa-solid fa-xmark text-xs"></i>
           </button>
         </div>
@@ -505,7 +494,7 @@
           </div>
         </div>
         <button id="btn-history-clear"
-                class="m-3 mb-3 w-[calc(100%-1.5rem)] text-xs rounded-2xl py-2 bg-rose-500/15 border border-rose-400/60 text-rose-200">
+          class="m-3 mb-3 w-[calc(100%-1.5rem)] text-xs rounded-2xl py-2 bg-rose-500/15 border border-rose-400/60 text-rose-200">
           Clear All
         </button>
       </aside>
@@ -513,7 +502,28 @@
   </div>
 
   <script>
-    // ---------- State ----------
+    // -------- Polyfills for some Math functions (for older browsers) --------
+    if (!Math.log10) Math.log10 = function (x) { return Math.log(x) / Math.LN10; };
+    if (!Math.log2) Math.log2 = function (x) { return Math.log(x) / Math.LN2; };
+    if (!Math.cbrt) Math.cbrt = function (x) { return Math.pow(x, 1 / 3); };
+    if (!Math.trunc) Math.trunc = function (x) { return x < 0 ? Math.ceil(x) : Math.floor(x); };
+    if (!Math.sign) Math.sign = function (x) { return x === 0 || isNaN(x) ? x : x > 0 ? 1 : -1; };
+    if (!Math.hypot) Math.hypot = function () {
+      let y = 0;
+      for (let i = 0; i < arguments.length; i++) y += arguments[i] * arguments[i];
+      return Math.sqrt(y);
+    };
+    if (!Math.clz32) Math.clz32 = function (x) {
+      let v = x >>> 0;
+      if (v === 0) return 32;
+      let n = 0;
+      while ((v & 0x80000000) === 0) { v <<= 1; n++; }
+      return n;
+    };
+    if (!Math.imul) Math.imul = function (a, b) { return (a | 0) * (b | 0) | 0; };
+    if (!Math.fround) Math.fround = function (x) { return x; };
+
+    // -------- State --------
     let currentExp = "0";
     let history = [];
 
@@ -525,11 +535,10 @@
     const historyListEl = document.getElementById("history-list");
     const tiltWrapper = document.getElementById("tilt-wrapper");
 
-    // ---------- Rendering ----------
+    // -------- Rendering --------
     function renderDisplay() {
       let view = currentExp.replace(/\*/g, "×").replace(/\//g, "÷");
       if (view === "") view = "0";
-
       displayEl.textContent = view;
 
       const len = view.length;
@@ -549,153 +558,15 @@
           '<div class="text-center text-slate-500 mt-6 text-[11px] px-3">No calculations yet</div>';
         return;
       }
-
       historyListEl.innerHTML = history
         .map(
           (h, i) => `
-        <div class="history-item" data-index="${i}">
-          <div class="history-expr">${h.expr}</div>
-          <div class="history-res">= ${h.res}</div>
-        </div>`
+          <div class="history-item" data-index="${i}">
+            <div class="history-expr">${h.expr}</div>
+            <div class="history-res">= ${h.res}</div>
+          </div>`
         )
         .join("");
     }
 
-    // ---------- Core logic ----------
-    function handleInput(val) {
-      if (currentExp === "0" && val !== ".") currentExp = val;
-      else currentExp += val;
-      renderDisplay();
-    }
-
-    function handleOp(op) {
-      const last = currentExp.slice(-1);
-      if (["+", "-", "*", "/", "%"].includes(last)) {
-        currentExp = currentExp.slice(0, -1) + op;
-      } else {
-        currentExp += op;
-      }
-      renderDisplay();
-    }
-
-    function handleFunc(type) {
-      if (currentExp === "0") currentExp = "";
-
-      if (type === "sqrt") currentExp += "Math.sqrt(";
-      else if (type === "sin") currentExp += "Math.sin(";
-      else if (type === "cos") currentExp += "Math.cos(";
-      else if (type === "pow") currentExp += "**2";
-
-      renderDisplay();
-    }
-
-    function handleDelete() {
-      if (currentExp.length === 1) currentExp = "0";
-      else currentExp = currentExp.slice(0, -1);
-      renderDisplay();
-    }
-
-    function handleClear() {
-      currentExp = "0";
-      prevEl.textContent = "";
-      renderDisplay();
-    }
-
-    function calculate() {
-      try {
-        // cute easter egg
-        if (currentExp === "520" || currentExp === "1314") {
-          prevEl.textContent = "Secret code unlocked 💖";
-          return;
-        }
-
-        let evalStr = currentExp.replace(/×/g, "*").replace(/÷/g, "/");
-
-        // try to balance parentheses a little (simple)
-        const open = (evalStr.match(/\(/g) || []).length;
-        const close = (evalStr.match(/\)/g) || []).length;
-        if (open > close) evalStr += ")".repeat(open - close);
-
-        // eslint-disable-next-line no-eval
-        const result = eval(evalStr);
-
-        if (!isFinite(result) || isNaN(result)) throw new Error("Invalid");
-
-        const prettyResult = parseFloat(result.toFixed(8));
-        addToHistory(currentExp, prettyResult);
-        prevEl.textContent = currentExp + " =";
-        currentExp = String(prettyResult);
-        renderDisplay();
-      } catch (err) {
-        prevEl.textContent = "Error";
-        shakeCard();
-      }
-    }
-
-    // ---------- UI Helpers ----------
-    function toggleSciDrawer() {
-      sciDrawer.classList.toggle("sci-open");
-    }
-
-    function openHistory() {
-      historyPanel.classList.add("open");
-    }
-
-    function closeHistory() {
-      historyPanel.classList.remove("open");
-    }
-
-    function clearHistory() {
-      history = [];
-      updateHistoryUI();
-    }
-
-    function shakeCard() {
-      const card = document.querySelector(".calc-card");
-      card.style.transform = "translateX(4px)";
-      setTimeout(() => (card.style.transform = "translateX(-4px)"), 60);
-      setTimeout(() => (card.style.transform = "translateX(2px)"), 120);
-      setTimeout(() => (card.style.transform = "translateX(0)"), 180);
-    }
-
-    // ---------- Event wiring ----------
-    // Keypad
-    keypadEl.addEventListener("click", (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
-
-      const valInput = btn.getAttribute("data-input");
-      const valOp = btn.getAttribute("data-op");
-      const action = btn.getAttribute("data-action");
-
-      if (valInput !== null) handleInput(valInput);
-      else if (valOp !== null) handleOp(valOp);
-      else if (action === "clear") handleClear();
-      else if (action === "delete") handleDelete();
-      else if (action === "equal") calculate();
-    });
-
-    // Sci drawer buttons
-    sciDrawer.addEventListener("click", (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
-
-      const func = btn.getAttribute("data-func");
-      const valInput = btn.getAttribute("data-input");
-
-      if (func) handleFunc(func);
-      else if (valInput !== null) handleInput(valInput);
-    });
-
-    // History actions
-    document
-      .getElementById("btn-history-open")
-      .addEventListener("click", openHistory);
-
-    document
-      .getElementById("btn-history-close")
-      .addEventListener("click", closeHistory);
-
-    document
-      .getElementById("btn-history-clear")
-  
+    // -------- C
