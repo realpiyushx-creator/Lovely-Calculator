@@ -502,71 +502,268 @@
   </div>
 
   <script>
-    // -------- Polyfills for some Math functions (for older browsers) --------
-    if (!Math.log10) Math.log10 = function (x) { return Math.log(x) / Math.LN10; };
-    if (!Math.log2) Math.log2 = function (x) { return Math.log(x) / Math.LN2; };
-    if (!Math.cbrt) Math.cbrt = function (x) { return Math.pow(x, 1 / 3); };
-    if (!Math.trunc) Math.trunc = function (x) { return x < 0 ? Math.ceil(x) : Math.floor(x); };
-    if (!Math.sign) Math.sign = function (x) { return x === 0 || isNaN(x) ? x : x > 0 ? 1 : -1; };
-    if (!Math.hypot) Math.hypot = function () {
-      let y = 0;
-      for (let i = 0; i < arguments.length; i++) y += arguments[i] * arguments[i];
-      return Math.sqrt(y);
-    };
-    if (!Math.clz32) Math.clz32 = function (x) {
-      let v = x >>> 0;
-      if (v === 0) return 32;
-      let n = 0;
-      while ((v & 0x80000000) === 0) { v <<= 1; n++; }
-      return n;
-    };
-    if (!Math.imul) Math.imul = function (a, b) { return (a | 0) * (b | 0) | 0; };
-    if (!Math.fround) Math.fround = function (x) { return x; };
+(function () {
+  "use strict";
 
-    // -------- State --------
-    let currentExp = "0";
-    let history = [];
+  // ----- STATE -----
+  var currentExp = "0";
+  var calcHistory = [];
 
-    const displayEl = document.getElementById("display");
-    const prevEl = document.getElementById("prev-calc");
-    const keypadEl = document.getElementById("keypad");
-    const sciDrawer = document.getElementById("sci-drawer");
-    const historyPanel = document.getElementById("history-panel");
-    const historyListEl = document.getElementById("history-list");
-    const tiltWrapper = document.getElementById("tilt-wrapper");
+  var displayEl        = document.getElementById("display");
+  var prevEl           = document.getElementById("prev-calc");
+  var keypadEl         = document.getElementById("keypad");
+  var sciDrawer        = document.getElementById("sci-drawer");
+  var historyPanel     = document.getElementById("history-panel");
+  var historyListEl    = document.getElementById("history-list");
+  var tiltWrapper      = document.getElementById("tilt-wrapper");
+  var btnSciToggle     = document.getElementById("btn-sci-toggle");
+  var btnHistOpen      = document.getElementById("btn-history-open");
+  var btnHistClose     = document.getElementById("btn-history-close");
+  var btnHistClear     = document.getElementById("btn-history-clear");
 
-    // -------- Rendering --------
-    function renderDisplay() {
-      let view = currentExp.replace(/\*/g, "×").replace(/\//g, "÷");
-      if (view === "") view = "0";
-      displayEl.textContent = view;
+  // ----- RENDER -----
+  function renderDisplay() {
+    var view = currentExp.replace(/\*/g, "×").replace(/\//g, "÷");
+    if (view === "") view = "0";
 
-      const len = view.length;
-      if (len > 14) displayEl.style.fontSize = "1.4rem";
-      else if (len > 9) displayEl.style.fontSize = "2.2rem";
-      else displayEl.style.fontSize = "2.6rem";
+    displayEl.textContent = view;
+
+    var len = view.length;
+    if (len > 14)      displayEl.style.fontSize = "1.4rem";
+    else if (len > 9)  displayEl.style.fontSize = "2.2rem";
+    else               displayEl.style.fontSize = "2.6rem";
+  }
+
+  function addToHistory(expr, res) {
+    calcHistory.unshift({
+      expr: expr,
+      res:  res,
+      time: new Date().toLocaleTimeString()
+    });
+    updateHistoryUI();
+  }
+
+  function updateHistoryUI() {
+    if (calcHistory.length === 0) {
+      historyListEl.innerHTML =
+        '<div class="text-center text-slate-500 mt-6 text-[11px] px-3">No calculations yet</div>';
+      return;
     }
 
-    function addToHistory(expr, res) {
-      history.unshift({ expr, res, time: new Date().toLocaleTimeString() });
-      updateHistoryUI();
+    var html = "";
+    for (var i = 0; i < calcHistory.length; i++) {
+      var h = calcHistory[i];
+      html +=
+        '<div class="history-item" data-index="' + i + '">' +
+          '<div class="history-expr">' + h.expr + '</div>' +
+          '<div class="history-res">= ' + h.res + '</div>' +
+        "</div>";
     }
+    historyListEl.innerHTML = html;
+  }
 
-    function updateHistoryUI() {
-      if (history.length === 0) {
-        historyListEl.innerHTML =
-          '<div class="text-center text-slate-500 mt-6 text-[11px] px-3">No calculations yet</div>';
+  // ----- CORE LOGIC -----
+  function handleInput(val) {
+    if (currentExp === "0" && val !== ".") currentExp = val;
+    else currentExp += val;
+    renderDisplay();
+  }
+
+  function handleOp(op) {
+    var last = currentExp.slice(-1);
+    if (last && "+-*/%".indexOf(last) !== -1) {
+      currentExp = currentExp.slice(0, -1) + op;
+    } else {
+      currentExp += op;
+    }
+    renderDisplay();
+  }
+
+  function handleDelete() {
+    if (currentExp.length === 1) currentExp = "0";
+    else currentExp = currentExp.slice(0, -1);
+    renderDisplay();
+  }
+
+  function handleClear() {
+    currentExp = "0";
+    prevEl.textContent = "";
+    renderDisplay();
+  }
+
+  function calculate() {
+    try {
+      // Easter egg
+      if (currentExp === "520" || currentExp === "1314") {
+        prevEl.textContent = "Secret code unlocked 💖";
         return;
       }
-      historyListEl.innerHTML = history
-        .map(
-          (h, i) => `
-          <div class="history-item" data-index="${i}">
-            <div class="history-expr">${h.expr}</div>
-            <div class="history-res">= ${h.res}</div>
-          </div>`
-        )
-        .join("");
-    }
 
-    // -------- C
+      var evalStr = currentExp.replace(/×/g, "*").replace(/÷/g, "/");
+
+      // Roughly balance parentheses
+      var open  = (evalStr.match(/\(/g) || []).length;
+      var close = (evalStr.match(/\)/g) || []).length;
+      if (open > close) {
+        var diff = open - close;
+        while (diff-- > 0) evalStr += ")";
+      }
+
+      // Evaluate
+      // WARNING: uses eval; only for this calculator context
+      var result = eval(evalStr);
+
+      if (!isFinite(result) || isNaN(result)) throw new Error("Invalid");
+
+      var prettyResult = parseFloat(result.toFixed(8));
+      addToHistory(currentExp, prettyResult);
+      prevEl.textContent = currentExp + " =";
+      currentExp = String(prettyResult);
+      renderDisplay();
+    } catch (e) {
+      prevEl.textContent = "Error";
+      shakeCard();
+    }
+  }
+
+  // ----- UI HELPERS -----
+  function toggleSciDrawer() {
+    if (!sciDrawer) return;
+    if (sciDrawer.classList.contains("sci-open")) {
+      sciDrawer.classList.remove("sci-open");
+    } else {
+      sciDrawer.classList.add("sci-open");
+    }
+  }
+
+  function openHistory() {
+    if (historyPanel) historyPanel.classList.add("open");
+  }
+
+  function closeHistory() {
+    if (historyPanel) historyPanel.classList.remove("open");
+  }
+
+  function clearHistory() {
+    calcHistory = [];
+    updateHistoryUI();
+  }
+
+  function shakeCard() {
+    var card = document.querySelector(".calc-card");
+    if (!card) return;
+    card.style.transform = "translateX(4px)";
+    setTimeout(function () { card.style.transform = "translateX(-4px)"; }, 60);
+    setTimeout(function () { card.style.transform = "translateX(2px)";  }, 120);
+    setTimeout(function () { card.style.transform = "translateX(0)";   }, 180);
+  }
+
+  // ----- EVENT WIRING -----
+  // Main keypad
+  if (keypadEl) {
+    keypadEl.addEventListener("click", function (e) {
+      var btn = e.target;
+      while (btn && btn !== keypadEl && !btn.hasAttribute("data-input") &&
+             !btn.hasAttribute("data-op") && !btn.hasAttribute("data-action")) {
+        btn = btn.parentNode;
+      }
+      if (!btn || btn === keypadEl) return;
+
+      var valInput = btn.getAttribute("data-input");
+      var valOp    = btn.getAttribute("data-op");
+      var action   = btn.getAttribute("data-action");
+
+      if (valInput !== null)      handleInput(valInput);
+      else if (valOp !== null)    handleOp(valOp);
+      else if (action === "clear")  handleClear();
+      else if (action === "delete") handleDelete();
+      else if (action === "equal")  calculate();
+    });
+  }
+
+  // Scientific buttons – they just insert raw tokens defined in data-insert
+  if (sciDrawer) {
+    sciDrawer.addEventListener("click", function (e) {
+      var btn = e.target;
+      while (btn && btn !== sciDrawer && !btn.hasAttribute("data-insert")) {
+        btn = btn.parentNode;
+      }
+      if (!btn || btn === sciDrawer) return;
+
+      var insert = btn.getAttribute("data-insert");
+      if (insert === null) return;
+
+      if (currentExp === "0") currentExp = "";
+      currentExp += insert;
+      renderDisplay();
+    });
+  }
+
+  // History controls
+  if (btnHistOpen)  btnHistOpen.addEventListener("click", openHistory);
+  if (btnHistClose) btnHistClose.addEventListener("click", closeHistory);
+  if (btnHistClear) btnHistClear.addEventListener("click", clearHistory);
+
+  if (historyListEl) {
+    historyListEl.addEventListener("click", function (e) {
+      var item = e.target;
+      while (item && item !== historyListEl && !item.hasAttribute("data-index")) {
+        item = item.parentNode;
+      }
+      if (!item || item === historyListEl) return;
+
+      var idxStr = item.getAttribute("data-index");
+      var index  = parseInt(idxStr, 10);
+      if (isNaN(index) || !calcHistory[index]) return;
+
+      currentExp = String(calcHistory[index].res);
+      renderDisplay();
+      closeHistory();
+    });
+  }
+
+  // Sci toggle
+  if (btnSciToggle) {
+    btnSciToggle.addEventListener("click", toggleSciDrawer);
+  }
+
+  // Tilt effect (safe)
+  function handleTilt(clientX, clientY) {
+    if (!tiltWrapper) return;
+    var rect = tiltWrapper.getBoundingClientRect();
+    var x = (clientX - rect.left - rect.width  / 2) / rect.width;
+    var y = (clientY - rect.top  - rect.height / 2) / rect.height;
+    var rotateX = y * 10;
+    var rotateY = -x * 10;
+    tiltWrapper.style.transform =
+      "perspective(900px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg)";
+  }
+
+  if (tiltWrapper) {
+    tiltWrapper.addEventListener("mousemove", function (e) {
+      handleTilt(e.clientX, e.clientY);
+    });
+
+    tiltWrapper.addEventListener("mouseleave", function () {
+      tiltWrapper.style.transform =
+        "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    });
+
+    tiltWrapper.addEventListener("touchmove", function (e) {
+      var t = e.touches[0];
+      handleTilt(t.clientX, t.clientY);
+    }, { passive: true });
+
+    tiltWrapper.addEventListener("touchend", function () {
+      tiltWrapper.style.transform =
+        "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    });
+  }
+
+  // Initial
+  renderDisplay();
+  updateHistoryUI();
+})();
+  </script>
+  </body>
+</html>
